@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Ardi - Ai 🤖</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body { font-family: Arial; background: #121212; color: white; margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; }
+    .header { background: #282828; padding: 15px; text-align: center; font-weight: bold; }
+    .chat-box { flex: 1; padding: 10px; overflow-y: auto; }
+    .message-container { margin: 5px 0; }
+    .message { padding: 10px; border-radius: 10px; max-width: 75%; }
+    .user { background: #007bff; align-self: flex-end; }
+    .bot { background: #333; align-self: flex-start; }
+    .input-box { display: flex; padding: 10px; background: #282828; }
+    input { flex: 1; padding: 10px; border-radius: 10px; border: none; background: #444; color: white; }
+    button { background: #007bff; color: white; border: none; padding: 10px 15px; margin-left: 10px; border-radius: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="header">Ardi - Ai 🤖</div>
+  <div id="chatBox" class="chat-box"></div>
+  <div class="input-box">
+    <input id="userInput" type="text" placeholder="Ketik pesan..." onkeypress="if(event.key==='Enter') sendMessage();" />
+    <button onclick="sendMessage()">➤</button>
+  </div>
+  <script>
+    function scrollToBottom() {
+      const chatBox = document.getElementById('chatBox');
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    function addMessage(text, sender) {
+      const chatBox = document.getElementById('chatBox');
+      const container = document.createElement('div');
+      container.className = 'message-container';
+      const msg = document.createElement('div');
+      msg.className = 'message ' + sender;
+      msg.textContent = text;
+      container.appendChild(msg);
+      chatBox.appendChild(container);
+      scrollToBottom();
+    }
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const message = input.value.trim();
+      if (!message) return;
+      addMessage(message, 'user');
+      input.value = '';
+      addMessage('...', 'bot');
+      try {
+        const res = await axios.post('/api/ardi', { content: message });
+        document.querySelector('.bot:last-of-type').textContent = res.data.result;
+      } catch (e) {
+        document.querySelector('.bot:last-of-type').textContent = '❌ Error: ' + e.message;
+      }
+    }
+  </script>
+</body>
+</html>
